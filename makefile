@@ -2,7 +2,7 @@ BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src
 TARGET_EXEC ?= main
 
-SDL_LIBS := -pthread
+SDL_LIBS := #-pthread
 
 ifeq ($(OS),Windows_NT)
 	detected_os := win
