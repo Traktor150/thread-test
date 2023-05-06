@@ -1,1 +1,7 @@
-a.exe
+**/.DS_Store
+**/.vscode
+**/*.a
+**/*.o
+**/build
+**/config.ini
+
