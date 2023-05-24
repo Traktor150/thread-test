@@ -2,11 +2,29 @@
 #include <stdlib.h> // malloc
 #include <pthread.h>
 
+// create a global lock
+pthread_mutex_t lock;
+
+
 // print hello world2 with a new line using a function
 void *print_hello_world2()
 {
     printf("Hello World2!\n");
     // while (1);
+    return NULL;
+}
+
+// count to 1000000 safe
+void *count_to_1000000_safe(void *num){
+    int *num_ptr = (int *)num;
+    for (int i = 0; i < 1000000; i++)
+    {
+        // lock the lock
+        pthread_mutex_lock(&lock);
+        *num_ptr += 1;
+        // unlock the lock
+        pthread_mutex_unlock(&lock);
+    }
     return NULL;
 }
 
@@ -62,17 +80,33 @@ int main(int argc, char const *argv[])
 
     // print_read_as_int(stru);
 
+    // init the lock
+    pthread_mutex_init(&lock, NULL);
+
     int num = 0;
+    pthread_t thread2_safe;
+    pthread_t thread3_safe;
+    pthread_create(&thread2_safe, NULL, count_to_1000000_safe, &num);
+    pthread_create(&thread3_safe, NULL, count_to_1000000_safe, &num);
+    
+    // wait for the thread to finish
+    pthread_join(thread2_safe, NULL);
+    pthread_join(thread3_safe, NULL);
+    printf("safe num should be 2000000\n");
+    printf("num: %d\n", num);
+
+    // without lock
+    int num2 = 0;
     pthread_t thread2;
     pthread_t thread3;
-    pthread_create(&thread2, NULL, count_to_1000000, &num);
-    pthread_create(&thread3, NULL, count_to_1000000, &num);
+    pthread_create(&thread2, NULL, count_to_1000000, &num2);
+    pthread_create(&thread3, NULL, count_to_1000000, &num2);
     
     // wait for the thread to finish
     pthread_join(thread2, NULL);
     pthread_join(thread3, NULL);
-    printf("num should be 2000000\n");
-    printf("num: %d\n", num);
+    printf("unsafe num should be 2000000\n");
+    printf("num: %d\n", num2);
 
     
     return 0;
